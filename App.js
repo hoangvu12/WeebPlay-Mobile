@@ -1,21 +1,40 @@
-import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { QueryClient, QueryClientProvider } from "react-query";
+import { createStackNavigator } from "@react-navigation/stack";
+
+import tabs, { options as tabsOptions } from "./tabs";
+import screens, { options as screenOptions } from "./screens";
+
+const Tab = createBottomTabNavigator();
+const queryClient = new QueryClient();
+
+const Stack = createStackNavigator();
+
+const Tabs = () => (
+  <Tab.Navigator {...tabsOptions}>
+    {tabs.map((tab) => (
+      <Tab.Screen {...tab} key={tab.name} />
+    ))}
+  </Tab.Navigator>
+);
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <QueryClientProvider client={queryClient}>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={screenOptions} initialRouteName="Tabs">
+          <Stack.Screen
+            name="Tabs"
+            component={Tabs}
+            options={{ headerShown: false }}
+          />
+          {screens.map((screen) => (
+            <Stack.Screen {...screen} key={screen.name} />
+          ))}
+        </Stack.Navigator>
+      </NavigationContainer>
+    </QueryClientProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#181818",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
