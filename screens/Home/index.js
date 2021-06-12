@@ -9,14 +9,10 @@ import {
 } from "react-native";
 import Carousel from "react-native-snap-carousel";
 import { useQuery } from "react-query";
-import { OptimizedFlatList } from "react-native-optimized-flatlist";
-
 import API from "../../api";
-
 import AnimeCard, { CARD_HEIGHT } from "../../shared/AnimeCard";
 import { LoadingLoader, WarningLoader } from "../../shared/Loader";
 import Section from "../../shared/Section";
-
 import { moderateScale } from "../../utils/scale";
 import CarouselCard from "./AnimeCarouselCard";
 

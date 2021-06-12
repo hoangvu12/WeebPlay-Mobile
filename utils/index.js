@@ -7,3 +7,7 @@ export function notifyMessage(msg) {
     AlertIOS.alert(msg);
   }
 }
+
+export function numberWithCommas(x) {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}

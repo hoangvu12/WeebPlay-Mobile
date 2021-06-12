@@ -1,8 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { useCallback } from "react";
 import { Dimensions, View } from "react-native";
-import { OptimizedFlatList } from "react-native-optimized-flatlist";
-
 import {
   MaterialTabBar,
   Tabs,
@@ -78,7 +76,9 @@ export function CardScreen({ slug }) {
       }
     );
 
-  const handleEndReached = () => fetchNextPage();
+  const handleEndReached = () => {
+    // fetchNextPage()
+  };
 
   if (focusedTab !== slug) return <View></View>;
 
@@ -99,10 +99,12 @@ export function CardScreen({ slug }) {
         keyExtractor={(item, index) => index}
         onEndReached={handleEndReached}
         onEndReachedThreshold={1}
-        style={{ flex: 1 }}
         getItemLayout={getItemLayout}
         initialNumToRender={12}
-        columnWrapperStyle={{ flex: 1, justifyContent: "center" }}
+        contentContainerStyle={{
+          flexGrow: 1,
+          alignItems: "center",
+        }}
       />
     </View>
   );
@@ -111,12 +113,11 @@ export function CardScreen({ slug }) {
 export default function BrowseScreen() {
   return (
     <Tabs.Container
-      containerStyle={{ paddingTop: 20 }}
       renderTabBar={(props) => (
         <MaterialTabBar
           {...props}
           style={{ backgroundColor: "#18191A" }}
-          labelStyle={{ color: "white", fontSize: moderateScale(18) }}
+          labelStyle={{ color: "white" }}
           indicatorStyle={{ backgroundColor: "#FF6500" }}
           scrollEnabled={true}
         />
@@ -125,7 +126,7 @@ export default function BrowseScreen() {
       {genres.map((genre) => (
         <Tabs.Tab name={genre.slug} label={genre.name} key={genre.slug}>
           <View width={screenWidth} height={screenHeight}>
-            <View style={{ flex: 1 }}>
+            <View style={{ flex: 1, paddingTop: 20 }}>
               <CardScreen {...genre} />
             </View>
           </View>

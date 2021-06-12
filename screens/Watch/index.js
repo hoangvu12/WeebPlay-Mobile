@@ -3,13 +3,24 @@
 import { useNavigation } from "@react-navigation/core";
 import { StatusBar } from "expo-status-bar";
 import React, { useCallback, useState } from "react";
-import { Dimensions, ScrollView, StyleSheet, Text, View } from "react-native";
-import { OptimizedFlatList } from "react-native-optimized-flatlist";
+import {
+  Dimensions,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+} from "react-native";
 import { useQuery, useQueryClient } from "react-query";
 import API from "../../api";
 import useOrientation from "../../hooks/useOrientation";
 import AnimeCard, { CARD_HEIGHT } from "../../shared/AnimeCard";
-import { LoadingLoader, WarningLoader } from "../../shared/Loader";
+import {
+  LoadingLoader,
+  WarningLoader,
+  DialogLoader,
+} from "../../shared/Loader";
+import { numberWithCommas } from "../../utils";
 import { moderateScale } from "../../utils/scale";
 import Video from "./Video";
 
@@ -107,7 +118,7 @@ export default function Watch({ route }) {
       return API.getEpisodeInfo(animeId, episode);
     },
     {
-      enabled: !!animeId,
+      enabled: !!animeId && animeInfo.episodes.length > 0,
     }
   );
 
@@ -118,6 +129,17 @@ export default function Watch({ route }) {
   };
 
   const orientation = useOrientation();
+
+  // If there is no episode, it means the anime is upcoming
+  if (!isAnimeLoading && animeInfo.episodes.length === 0) {
+    return (
+      <DialogLoader
+        text="Đây là phim sắp chiếu! Hãy quay lại sau"
+        buttonTitle="Quay về"
+        onPress={() => navigation.goBack()}
+      />
+    );
+  }
 
   if (isAnimeLoading || isEpisodeLoading || isIdle) {
     return <LoadingLoader />;
@@ -145,97 +167,16 @@ export default function Watch({ route }) {
       {orientation !== "LANDSCAPE" && (
         <View style={styles.infoContainer}>
           <ScrollView horizontal style={{ flex: 1 }}>
-            <ScrollView
-              style={[
-                styles.column,
-                {
-                  width: screenWidth - moderateScale(25),
-                },
-              ]}
+            <Column
+              as={ScrollView}
+              style={{
+                width: screenWidth - moderateScale(25),
+              }}
             >
-              <View style={{ marginBottom: moderateScale(20) }}>
-                <Text
-                  style={{
-                    fontSize: moderateScale(16),
-                    fontWeight: "bold",
-                    color: "#E2610E",
-                  }}
-                  numberOfLines={1}
-                >
-                  {animeInfo.name}
-                </Text>
-              </View>
+              <InfoColumn info={animeInfo} />
+            </Column>
 
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  marginBottom: 10,
-                }}
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    marginBottom: moderateScale(10),
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: moderateScale(14),
-                      fontWeight: "bold",
-                      color: "white",
-                      marginRight: moderateScale(20),
-                    }}
-                    numberOfLines={1}
-                  >
-                    Thời lượng
-                  </Text>
-                  <Text
-                    style={{
-                      fontSize: moderateScale(12),
-                      color: "gray",
-                    }}
-                    numberOfLines={1}
-                  >
-                    {animeInfo.time}
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    marginBottom: moderateScale(10),
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: moderateScale(14),
-                      fontWeight: "bold",
-                      color: "white",
-                      marginRight: moderateScale(20),
-                    }}
-                    numberOfLines={1}
-                  >
-                    Lượt xem
-                  </Text>
-                  <Text
-                    style={{
-                      fontSize: moderateScale(12),
-                      color: "gray",
-                    }}
-                    numberOfLines={1}
-                  >
-                    {animeInfo.views}
-                  </Text>
-                </View>
-              </View>
-            </ScrollView>
-
-            <ScrollView
-              style={styles.column}
-              contentContainerStyle={{ flex: 1 }}
-            >
+            <Column>
               <Text
                 style={{
                   color: "white",
@@ -259,11 +200,9 @@ export default function Watch({ route }) {
                 getItemLayout={getItemLayout}
                 columnWrapperStyle={{ flex: 1, justifyContent: "center" }}
               />
-            </ScrollView>
-            <ScrollView
-              style={styles.column}
-              contentContainerStyle={{ flex: 1 }}
-            >
+            </Column>
+
+            <Column>
               <Text
                 style={{
                   color: "white",
@@ -285,13 +224,92 @@ export default function Watch({ route }) {
                 getItemLayout={getItemLayout}
                 columnWrapperStyle={{ flex: 1, justifyContent: "center" }}
               />
-            </ScrollView>
+            </Column>
           </ScrollView>
         </View>
       )}
     </View>
   );
 }
+
+const Column = ({ as: Component = View, children, style }) => (
+  <Component style={[styles.column, style]}>{children}</Component>
+);
+
+const InfoColumn = ({ info }) => (
+  <>
+    <View style={{ marginBottom: moderateScale(20) }}>
+      <Text
+        style={{
+          fontSize: moderateScale(16),
+          fontWeight: "bold",
+          color: "#E2610E",
+        }}
+        numberOfLines={1}
+      >
+        {info.name}
+      </Text>
+    </View>
+
+    <View
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        marginBottom: 5,
+      }}
+    >
+      <Text
+        style={{
+          fontSize: moderateScale(14),
+          fontWeight: "bold",
+          color: "white",
+          marginRight: moderateScale(20),
+        }}
+        numberOfLines={1}
+      >
+        Thời lượng
+      </Text>
+      <Text
+        style={{
+          fontSize: moderateScale(12),
+          color: "gray",
+        }}
+        numberOfLines={1}
+      >
+        {info.time}
+      </Text>
+    </View>
+    <View
+      style={{
+        flex: 1,
+        flexDirection: "row",
+        alignItems: "center",
+        marginBottom: 5,
+      }}
+    >
+      <Text
+        style={{
+          fontSize: moderateScale(14),
+          fontWeight: "bold",
+          color: "white",
+          marginRight: moderateScale(20),
+        }}
+        numberOfLines={1}
+      >
+        Lượt xem
+      </Text>
+      <Text
+        style={{
+          fontSize: moderateScale(12),
+          color: "gray",
+        }}
+        numberOfLines={1}
+      >
+        {numberWithCommas(info.views)} lượt xem
+      </Text>
+    </View>
+  </>
+);
 
 const styles = StyleSheet.create({
   container: {
