@@ -76,9 +76,7 @@ export function CardScreen({ slug }) {
       }
     );
 
-  const handleEndReached = () => {
-    // fetchNextPage()
-  };
+  const handleEndReached = () => fetchNextPage();
 
   if (focusedTab !== slug) return <View></View>;
 
