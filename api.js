@@ -26,8 +26,6 @@ class API {
   static async getAnimeListFromType(typeSlug, page = 1) {
     const URL = `${BASE_URL}/type/${typeSlug}/page/${page}`;
 
-    console.log(typeSlug, page);
-
     return fetchData(URL);
   }
 }

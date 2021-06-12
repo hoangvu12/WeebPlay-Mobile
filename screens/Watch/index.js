@@ -2,19 +2,13 @@
 /* eslint-disable react/prop-types */
 import { useNavigation } from "@react-navigation/core";
 import { StatusBar } from "expo-status-bar";
-import React, { useState, useCallback } from "react";
-import {
-  Dimensions,
-  FlatList,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import React, { useCallback, useState } from "react";
+import { Dimensions, ScrollView, StyleSheet, Text, View } from "react-native";
+import { OptimizedFlatList } from "react-native-optimized-flatlist";
 import { useQuery, useQueryClient } from "react-query";
 import API from "../../api";
 import useOrientation from "../../hooks/useOrientation";
-import AnimeCard from "../../shared/AnimeCard";
+import AnimeCard, { CARD_HEIGHT } from "../../shared/AnimeCard";
 import { LoadingLoader, WarningLoader } from "../../shared/Loader";
 import { moderateScale } from "../../utils/scale";
 import Video from "./Video";
@@ -29,7 +23,16 @@ export default function Watch({ route }) {
 
   const navigation = useNavigation();
 
+  const getItemLayout = (data, index) => ({
+    length: CARD_HEIGHT,
+    offset: CARD_HEIGHT * index,
+    index,
+  });
+
   const handleEpisodeCardPress = (data) => setEpisode(data.name);
+  const handleAnimeCardPress = (data) =>
+    navigation.replace("Watch", { ...data });
+
   const handleNextPress = async (video) => {
     await video.current.pauseAsync();
 
@@ -42,11 +45,7 @@ export default function Watch({ route }) {
   };
 
   const queryClient = useQueryClient();
-
   const animeList = queryClient.getQueryData("animeList");
-
-  const handleAnimeCardPress = (data) =>
-    navigation.replace("Watch", { ...data });
 
   const handleEpisodeItem = useCallback(
     ({ item }) => (
@@ -63,7 +62,7 @@ export default function Watch({ route }) {
         {...item}
       />
     ),
-    []
+    [episode]
   );
 
   const handleAnimeItem = useCallback(
@@ -74,6 +73,7 @@ export default function Watch({ route }) {
           marginRight: 20,
           marginBottom: 20,
         }}
+        title={item.name}
         description={item.episode || item.time}
         onPress={handleAnimeCardPress}
       />
@@ -145,7 +145,14 @@ export default function Watch({ route }) {
       {orientation !== "LANDSCAPE" && (
         <View style={styles.infoContainer}>
           <ScrollView horizontal style={{ flex: 1 }}>
-            <ScrollView style={styles.column}>
+            <ScrollView
+              style={[
+                styles.column,
+                {
+                  width: screenWidth - moderateScale(25),
+                },
+              ]}
+            >
               <View style={{ marginBottom: moderateScale(20) }}>
                 <Text
                   style={{
@@ -166,82 +173,60 @@ export default function Watch({ route }) {
                   marginBottom: 10,
                 }}
               >
-                <Text
-                  style={{
-                    fontSize: moderateScale(14),
-                    fontWeight: "bold",
-                    color: "white",
-                    marginRight: moderateScale(20),
-                  }}
-                  numberOfLines={1}
-                >
-                  Thể loại
-                </Text>
-                <Text
-                  style={{
-                    fontSize: moderateScale(12),
-                    color: "gray",
-                  }}
-                  numberOfLines={1}
-                >
-                  {animeInfo.genres.join(", ")}
-                </Text>
-              </View>
-
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  marginBottom: moderateScale(10),
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: moderateScale(14),
-                    fontWeight: "bold",
-                    color: "white",
-                    marginRight: moderateScale(20),
-                  }}
-                  numberOfLines={1}
-                >
-                  Lượt xem
-                </Text>
-                <Text
-                  style={{
-                    fontSize: moderateScale(12),
-                    color: "gray",
-                  }}
-                  numberOfLines={1}
-                >
-                  {animeInfo.views}
-                </Text>
-              </View>
-
-              <View>
-                <Text
-                  style={{
-                    fontSize: moderateScale(14),
-                    fontWeight: "bold",
-                    color: "white",
-                    marginBottom: moderateScale(20),
-                  }}
-                  numberOfLines={1}
-                >
-                  Nội dung
-                </Text>
-
                 <View
                   style={{
-                    width: screenWidth - moderateScale(25),
+                    flexDirection: "row",
+                    alignItems: "center",
+                    marginBottom: moderateScale(10),
                   }}
                 >
                   <Text
                     style={{
+                      fontSize: moderateScale(14),
+                      fontWeight: "bold",
                       color: "white",
-                      fontSize: moderateScale(12),
+                      marginRight: moderateScale(20),
                     }}
+                    numberOfLines={1}
                   >
-                    {animeInfo.description}
+                    Thời lượng
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: moderateScale(12),
+                      color: "gray",
+                    }}
+                    numberOfLines={1}
+                  >
+                    {animeInfo.time}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    marginBottom: moderateScale(10),
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: moderateScale(14),
+                      fontWeight: "bold",
+                      color: "white",
+                      marginRight: moderateScale(20),
+                    }}
+                    numberOfLines={1}
+                  >
+                    Lượt xem
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: moderateScale(12),
+                      color: "gray",
+                    }}
+                    numberOfLines={1}
+                  >
+                    {animeInfo.views}
                   </Text>
                 </View>
               </View>
@@ -267,9 +252,12 @@ export default function Watch({ route }) {
                 numColumns={2}
                 data={animeInfo.episodes.slice(0, showNumber)}
                 renderItem={handleEpisodeItem}
-                keyExtractor={(item, index) => index}
+                keyExtractor={(item) => item.id}
                 onEndReached={handleEndReached}
                 onEndReachedThreshold={1}
+                initialNumToRender={12}
+                getItemLayout={getItemLayout}
+                columnWrapperStyle={{ flex: 1, justifyContent: "center" }}
               />
             </ScrollView>
             <ScrollView
@@ -292,7 +280,10 @@ export default function Watch({ route }) {
                 numColumns={2}
                 data={animeList.recommended}
                 renderItem={handleAnimeItem}
-                keyExtractor={(item, index) => index}
+                keyExtractor={(item) => item.id}
+                initialNumToRender={12}
+                getItemLayout={getItemLayout}
+                columnWrapperStyle={{ flex: 1, justifyContent: "center" }}
               />
             </ScrollView>
           </ScrollView>

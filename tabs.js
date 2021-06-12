@@ -38,7 +38,7 @@ export const tabScreenOptions = {
 
 export const options = {
   tabBarOptions: tabScreenOptions,
-  initialRouteName: "Browse",
+  initialRouteName: "Home",
 };
 
 export default tabs;

@@ -1,16 +1,16 @@
-import React, { useState, useCallback } from "react";
-import { Dimensions, Text, View } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import React, { useCallback } from "react";
+import { Dimensions, View } from "react-native";
+import { OptimizedFlatList } from "react-native-optimized-flatlist";
+
 import {
   MaterialTabBar,
   Tabs,
   useFocusedTab,
 } from "react-native-collapsible-tab-view";
-import { useInfiniteQuery, useQuery } from "react-query";
-import { useNavigation } from "@react-navigation/native";
-
+import { useInfiniteQuery } from "react-query";
 import API from "../../api";
-
-import AnimeCard from "../../shared/AnimeCard";
+import AnimeCard, { CARD_HEIGHT } from "../../shared/AnimeCard";
 import { LoadingLoader, WarningLoader } from "../../shared/Loader";
 import { moderateScale } from "../../utils/scale";
 
@@ -42,16 +42,23 @@ export function CardScreen({ slug }) {
   const focusedTab = useFocusedTab();
   const handleCardPress = (data) => navigation.navigate("Watch", { ...data });
 
+  const getItemLayout = (data, index) => ({
+    length: CARD_HEIGHT,
+    offset: CARD_HEIGHT * index,
+    index,
+  });
+
   const renderItem = useCallback(
     ({ item }) => (
       <AnimeCard
         {...item}
+        title={item.name}
         containerStyle={{
           marginRight: 20,
           marginBottom: 20,
           width: moderateScale(160),
         }}
-        description={item.episode || item.time}
+        description={item.time}
         onPress={handleCardPress}
       />
     ),
@@ -73,16 +80,6 @@ export function CardScreen({ slug }) {
 
   const handleEndReached = () => fetchNextPage();
 
-  // const { isLoading, isError, data, isPreviousData } = useQuery(
-  //   [`animeType-${slug}`, { slug, page }],
-  //   ({ queryKey }) => {
-  //     const [key, { slug, page }] = queryKey;
-
-  //     return API.getAnimeListFromType(slug, page);
-  //   },
-  //   { keepPreviousData: true }
-  // );
-
   if (focusedTab !== slug) return <View></View>;
 
   if (isError) {
@@ -95,16 +92,17 @@ export function CardScreen({ slug }) {
   return (
     <View style={{ flex: 1 }}>
       <Tabs.FlatList
-        style={{
-          paddingHorizontal: 20,
-        }}
-        key={`${slug}`}
+        key={slug}
         numColumns={2}
         data={data.pages.map((page) => page.data).flat()}
         renderItem={renderItem}
         keyExtractor={(item, index) => index}
         onEndReached={handleEndReached}
         onEndReachedThreshold={1}
+        style={{ flex: 1 }}
+        getItemLayout={getItemLayout}
+        initialNumToRender={12}
+        columnWrapperStyle={{ flex: 1, justifyContent: "center" }}
       />
     </View>
   );
@@ -113,11 +111,12 @@ export function CardScreen({ slug }) {
 export default function BrowseScreen() {
   return (
     <Tabs.Container
+      containerStyle={{ paddingTop: 20 }}
       renderTabBar={(props) => (
         <MaterialTabBar
           {...props}
           style={{ backgroundColor: "#18191A" }}
-          labelStyle={{ color: "white" }}
+          labelStyle={{ color: "white", fontSize: moderateScale(18) }}
           indicatorStyle={{ backgroundColor: "#FF6500" }}
           scrollEnabled={true}
         />
@@ -125,12 +124,10 @@ export default function BrowseScreen() {
     >
       {genres.map((genre) => (
         <Tabs.Tab name={genre.slug} label={genre.name} key={genre.slug}>
-          <View
-            width={screenWidth}
-            height={screenHeight}
-            style={{ paddingTop: 20 }}
-          >
-            <CardScreen {...genre} />
+          <View width={screenWidth} height={screenHeight}>
+            <View style={{ flex: 1 }}>
+              <CardScreen {...genre} />
+            </View>
           </View>
         </Tabs.Tab>
       ))}

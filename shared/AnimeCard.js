@@ -55,6 +55,8 @@ const AnimeCard = React.memo(
 
 export default AnimeCard;
 
+export const CARD_HEIGHT = moderateScale(80);
+
 const styles = StyleSheet.create({
   container: {
     width: moderateScale(150),
@@ -62,7 +64,7 @@ const styles = StyleSheet.create({
   image: {
     resizeMode: "cover",
     width: "100%",
-    height: moderateScale(80),
+    height: CARD_HEIGHT,
     marginBottom: moderateScale(10),
     borderRadius: 7,
   },

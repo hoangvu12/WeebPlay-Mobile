@@ -10,7 +10,7 @@ export default function Section({
   children,
   title,
   titleStyle,
-  showMoreButton = true,
+  showMoreButton = false,
 }) {
   return (
     <View style={style}>

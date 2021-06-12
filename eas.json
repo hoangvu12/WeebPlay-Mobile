@@ -1,0 +1,15 @@
+{
+  "builds": {
+    "android": {
+      "release": {
+        "workflow": "managed",
+        "buildType": "apk"
+      }
+    },
+    "ios": {
+      "release": {
+        "workflow": "managed"
+      }
+    }
+  }
+}

@@ -9,18 +9,28 @@ import {
 } from "react-native";
 import Carousel from "react-native-snap-carousel";
 import { useQuery } from "react-query";
+import { OptimizedFlatList } from "react-native-optimized-flatlist";
+
 import API from "../../api";
-import AnimeCard from "../../shared/AnimeCard";
+
+import AnimeCard, { CARD_HEIGHT } from "../../shared/AnimeCard";
 import { LoadingLoader, WarningLoader } from "../../shared/Loader";
 import Section from "../../shared/Section";
+
 import { moderateScale } from "../../utils/scale";
-// import animeData from "../../data/anime.json";
 import CarouselCard from "./AnimeCarouselCard";
 
 const { width: screenWidth } = Dimensions.get("screen");
 
 export default function Home({ navigation }) {
   const { isLoading, isError, data } = useQuery("animeList", API.getAnimeList);
+
+  const getItemLayout = (data, index) => ({
+    length: CARD_HEIGHT,
+    offset: CARD_HEIGHT * index,
+    index,
+  });
+
   const handleCardPress = (data) => navigation.navigate("Watch", { ...data });
 
   const renderCarouselItem = ({ item }) => (
@@ -30,8 +40,9 @@ export default function Home({ navigation }) {
   const renderSectionItem = ({ item }) => (
     <AnimeCard
       {...item}
+      title={item.name}
       containerStyle={{ marginRight: moderateScale(20) }}
-      description={item.episode || item.time}
+      description={item.time}
       onPress={handleCardPress}
     />
   );
@@ -79,6 +90,8 @@ export default function Home({ navigation }) {
                 data={section.items}
                 renderItem={renderSectionItem}
                 keyExtractor={(item) => item.slug}
+                getItemLayout={getItemLayout}
+                initialNumToRender={12}
               />
             </Section>
           ))}

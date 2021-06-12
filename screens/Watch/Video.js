@@ -107,7 +107,7 @@ export default function Video({
     <TouchableWithoutFeedback onPressIn={handleScreenTouch}>
       <View style={styles.container}>
         <ExpoVideo
-          shouldPlay={false}
+          shouldPlay
           ref={video}
           style={styles.video}
           usePoster
@@ -187,7 +187,7 @@ export default function Video({
               {/* Play button */}
               <OverlayButton
                 icon={
-                  status.isBuffering ? (
+                  status.isBuffering && !status.isPlaying ? (
                     <ActivityIndicator
                       size={moderateScale(80)}
                       color="rgba(250,250,250,0.8)"
@@ -234,16 +234,6 @@ export default function Video({
             {/* Bottom */}
             <View style={styles.bottomOverlayContainer}>
               <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <OverlayButton
-                  icon={
-                    <Entypo
-                      name={"lock"}
-                      size={moderateScale(20)}
-                      color="white"
-                    />
-                  }
-                />
-
                 <Text
                   style={{
                     color: "white",
