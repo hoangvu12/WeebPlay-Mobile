@@ -1,5 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View, Image } from "react-native";
+import { moderateScale } from "../../utils/scale";
 
 export default function AnimeCarouselCard({ onPress, ...props }) {
   return (
@@ -19,7 +20,7 @@ export default function AnimeCarouselCard({ onPress, ...props }) {
 const styles = StyleSheet.create({
   image: {
     resizeMode: "contain",
-    width: "95%",
+    width: "100%",
     height: "100%",
     borderRadius: 7,
   },

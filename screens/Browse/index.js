@@ -10,6 +10,7 @@ import { useInfiniteQuery } from "react-query";
 import API from "../../api";
 import AnimeCard, { CARD_HEIGHT } from "../../shared/AnimeCard";
 import { LoadingLoader, WarningLoader } from "../../shared/Loader";
+import { notifyMessage } from "../../utils";
 import { moderateScale } from "../../utils/scale";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("screen");
@@ -76,7 +77,10 @@ export function CardScreen({ slug }) {
       }
     );
 
-  const handleEndReached = () => fetchNextPage();
+  const handleEndReached = () => {
+    notifyMessage("Đang tải dữ liệu.");
+    fetchNextPage();
+  };
 
   if (focusedTab !== slug) return <View></View>;
 
@@ -96,9 +100,9 @@ export function CardScreen({ slug }) {
         renderItem={renderItem}
         keyExtractor={(item, index) => index}
         onEndReached={handleEndReached}
-        onEndReachedThreshold={1}
+        onEndReachedThreshold={0.1}
         getItemLayout={getItemLayout}
-        initialNumToRender={12}
+        initialNumToRender={24}
         contentContainerStyle={{
           flexGrow: 1,
           alignItems: "center",

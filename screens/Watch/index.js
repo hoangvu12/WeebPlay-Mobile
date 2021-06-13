@@ -12,6 +12,7 @@ import {
   FlatList,
 } from "react-native";
 import { useQuery, useQueryClient } from "react-query";
+
 import API from "../../api";
 import useOrientation from "../../hooks/useOrientation";
 import AnimeCard, { CARD_HEIGHT } from "../../shared/AnimeCard";
@@ -158,6 +159,7 @@ export default function Watch({ route }) {
           source={episodeInfo.videoSource}
           topOverlayTitle={animeInfo.name}
           topOverlayDescription={`Tập ${episode}`}
+          isTopOverlayEnabled={orientation === "LANDSCAPE"}
           onPreviousPress={handlePreviousPress}
           onNextPress={handleNextPress}
           previousButtonDisable={episode <= 1}
@@ -170,7 +172,7 @@ export default function Watch({ route }) {
             <Column
               as={ScrollView}
               style={{
-                width: screenWidth - moderateScale(25),
+                width: screenWidth - moderateScale(50),
               }}
             >
               <InfoColumn info={animeInfo} />

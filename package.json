@@ -24,6 +24,7 @@
     "react-dom": "16.13.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-41.0.0.tar.gz",
     "react-native-animated-loader": "0.0.9",
+    "react-native-bottom-drawer-view": "^1.0.3",
     "react-native-collapsible-tab-view": "^4.2.0",
     "react-native-gesture-handler": "~1.10.2",
     "react-native-reanimated": "~2.1.0",
@@ -32,7 +33,8 @@
     "react-native-snap-carousel": "^3.9.1",
     "react-native-tab-view": "^2.16.0",
     "react-native-web": "^0.16.5",
-    "react-query": "^3.16.1"
+    "react-query": "^3.16.1",
+    "reanimated-bottom-sheet": "^1.0.0-alpha.22"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",

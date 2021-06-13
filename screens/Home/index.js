@@ -61,6 +61,7 @@ export default function Home({ navigation }) {
       <View
         style={{
           flex: 1,
+          position: "relative",
         }}
       >
         <Carousel
