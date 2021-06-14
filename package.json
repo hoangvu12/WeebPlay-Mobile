@@ -3,6 +3,7 @@
   "scripts": {
     "start": "expo start",
     "update": "expo publish",
+    "build": "eas build --platform android",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
