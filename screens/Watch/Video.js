@@ -79,18 +79,14 @@ export default function Video({
   }, []);
 
   const handleSeekLeftPress = useCallback(async () => {
-    console.log(status.positionMillis - 10000);
-
-    await video.current.setPositionAsync(status.positionMillis - 10000);
+    video.current.setPositionAsync(status.positionMillis - 10000);
   }, [status.positionMillis]);
 
   const handlePlayPress = () =>
     status.isPlaying ? video.current.pauseAsync() : video.current.playAsync();
 
   const handleSeekRightPress = useCallback(async () => {
-    console.log(status.positionMillis + 10000);
-
-    await video.current.setPositionAsync(status.positionMillis + 10000);
+    video.current.setPositionAsync(status.positionMillis + 10000);
   }, [status.positionMillis]);
 
   const handleNextPress = useCallback(() => {
@@ -141,7 +137,14 @@ export default function Video({
                 }
                 onPress={() => {
                   if (orientation !== "LANDSCAPE") {
-                    navigation.goBack();
+                    if (navigation.canGoBack()) {
+                      navigation.goBack();
+                    } else {
+                      navigation.reset({
+                        index: 0,
+                        routes: [{ name: "Tabs" }], // Home screen
+                      });
+                    }
                   } else {
                     ScreenOrientation.lockAsync(
                       ScreenOrientation.OrientationLock.PORTRAIT

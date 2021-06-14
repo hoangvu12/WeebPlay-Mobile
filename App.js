@@ -1,11 +1,14 @@
-import React from "react";
-import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { QueryClient, QueryClientProvider } from "react-query";
+import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-
-import tabs, { options as tabsOptions } from "./tabs";
+import * as Linking from "expo-linking";
+import React from "react";
+import { QueryClient, QueryClientProvider } from "react-query";
 import screens, { options as screenOptions } from "./screens";
+import { LoadingLoader } from "./shared/Loader";
+import tabs, { options as tabsOptions } from "./tabs";
+
+const prefix = Linking.createURL("/");
 
 const Tab = createBottomTabNavigator();
 const queryClient = new QueryClient();
@@ -21,9 +24,41 @@ const Tabs = () => (
 );
 
 export default function App() {
+  const config = {
+    screens: {
+      Watch: "watch/:slug",
+      Tabs: {
+        screens: {
+          Home: "/",
+          Browse: "browse",
+        },
+      },
+    },
+  };
+
+  const linking = {
+    prefixes: [prefix],
+    config,
+  };
+  // useEffect(() => {
+  //   Linking.getInitialURL().then((url) => {
+  //     console.log(Linking.parse(url), "initialUrl");
+  //   });
+
+  //   const handleUrl = (event) => {
+  //     const data = Linking.parse(event.url);
+
+  //     console.log(data);
+  //   };
+
+  //   Linking.addEventListener("url", handleUrl);
+
+  //   return () => Linking.removeEventListener("url", handleUrl);
+  // }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
-      <NavigationContainer>
+      <NavigationContainer linking={linking} fallback={<LoadingLoader />}>
         <Stack.Navigator screenOptions={screenOptions} initialRouteName="Tabs">
           <Stack.Screen
             name="Tabs"

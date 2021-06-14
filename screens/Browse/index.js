@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useNavigation } from "@react-navigation/native";
 import React, { useCallback } from "react";
 import { Dimensions, View } from "react-native";

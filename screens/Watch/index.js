@@ -204,29 +204,31 @@ export default function Watch({ route }) {
               />
             </Column>
 
-            <Column>
-              <Text
-                style={{
-                  color: "white",
-                  fontSize: moderateScale(18),
-                  fontWeight: "bold",
-                  paddingBottom: 14,
-                }}
-              >
-                Hôm nay xem gì
-              </Text>
+            {animeList && (
+              <Column>
+                <Text
+                  style={{
+                    color: "white",
+                    fontSize: moderateScale(18),
+                    fontWeight: "bold",
+                    paddingBottom: 14,
+                  }}
+                >
+                  Hôm nay xem gì
+                </Text>
 
-              <FlatList
-                key="recommended"
-                numColumns={2}
-                data={animeList.recommended}
-                renderItem={handleAnimeItem}
-                keyExtractor={(item) => item.id}
-                initialNumToRender={12}
-                getItemLayout={getItemLayout}
-                columnWrapperStyle={{ flex: 1, justifyContent: "center" }}
-              />
-            </Column>
+                <FlatList
+                  key="recommended"
+                  numColumns={2}
+                  data={animeList.recommended}
+                  renderItem={handleAnimeItem}
+                  keyExtractor={(item) => item.id}
+                  initialNumToRender={12}
+                  getItemLayout={getItemLayout}
+                  columnWrapperStyle={{ flex: 1, justifyContent: "center" }}
+                />
+              </Column>
+            )}
           </ScrollView>
         </View>
       )}
