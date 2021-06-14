@@ -79,15 +79,19 @@ export default function Video({
   }, []);
 
   const handleSeekLeftPress = useCallback(async () => {
+    console.log(status.positionMillis - 10000);
+
     await video.current.setPositionAsync(status.positionMillis - 10000);
-  }, []);
+  }, [status.positionMillis]);
 
   const handlePlayPress = () =>
     status.isPlaying ? video.current.pauseAsync() : video.current.playAsync();
 
   const handleSeekRightPress = useCallback(async () => {
+    console.log(status.positionMillis + 10000);
+
     await video.current.setPositionAsync(status.positionMillis + 10000);
-  }, []);
+  }, [status.positionMillis]);
 
   const handleNextPress = useCallback(() => {
     onNextPress(video);
