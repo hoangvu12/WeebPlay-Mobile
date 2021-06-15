@@ -165,7 +165,10 @@ export default function Video({
                     {topOverlayTitle}
                   </Text>
 
-                  <Text style={{ color: "gray", fontSize: moderateScale(13) }}>
+                  <Text
+                    numberOfLines={1}
+                    style={{ color: "gray", fontSize: moderateScale(12) }}
+                  >
                     {topOverlayDescription}
                   </Text>
                 </>
@@ -367,7 +370,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 0,
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "baseline",
     padding: moderateScale(12),
   },
   middleOverlayContainer: {

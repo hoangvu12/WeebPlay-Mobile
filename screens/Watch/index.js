@@ -4,28 +4,31 @@ import { useNavigation } from "@react-navigation/core";
 import { StatusBar } from "expo-status-bar";
 import React, { useCallback, useState } from "react";
 import {
-  Dimensions,
   ScrollView,
   StyleSheet,
   Text,
   View,
   FlatList,
+  Share,
 } from "react-native";
 import { useQuery, useQueryClient } from "react-query";
+import { Entypo } from "@expo/vector-icons";
 
 import API from "../../api";
 import useOrientation from "../../hooks/useOrientation";
+
 import AnimeCard, { CARD_HEIGHT } from "../../shared/AnimeCard";
 import {
   LoadingLoader,
   WarningLoader,
   DialogLoader,
 } from "../../shared/Loader";
+
 import { numberWithCommas } from "../../utils";
 import { moderateScale } from "../../utils/scale";
-import Video from "./Video";
 
-const { width: screenWidth } = Dimensions.get("screen");
+import Video from "./Video";
+import InfoButton from "./InfoButton";
 
 export default function Watch({ route }) {
   const [episode, setEpisode] = useState(1);
@@ -150,6 +153,8 @@ export default function Watch({ route }) {
     return <WarningLoader />;
   }
 
+  const currentEpisode = animeInfo.episodes[episode - 1];
+
   return (
     <View style={styles.container}>
       <StatusBar hidden />
@@ -158,7 +163,7 @@ export default function Watch({ route }) {
         <Video
           source={episodeInfo.videoSource}
           topOverlayTitle={animeInfo.name}
-          topOverlayDescription={`Tập ${episode}`}
+          topOverlayDescription={currentEpisode.full_name}
           isTopOverlayEnabled={orientation === "LANDSCAPE"}
           onPreviousPress={handlePreviousPress}
           onNextPress={handleNextPress}
@@ -169,12 +174,7 @@ export default function Watch({ route }) {
       {orientation !== "LANDSCAPE" && (
         <View style={styles.infoContainer}>
           <ScrollView horizontal style={{ flex: 1 }}>
-            <Column
-              as={ScrollView}
-              style={{
-                width: screenWidth - moderateScale(50),
-              }}
-            >
+            <Column as={ScrollView}>
               <InfoColumn info={animeInfo} />
             </Column>
 
@@ -240,80 +240,115 @@ const Column = ({ as: Component = View, children, style }) => (
   <Component style={[styles.column, style]}>{children}</Component>
 );
 
-const InfoColumn = ({ info }) => (
-  <>
-    <View style={{ marginBottom: moderateScale(20) }}>
-      <Text
-        style={{
-          fontSize: moderateScale(16),
-          fontWeight: "bold",
-          color: "#E2610E",
-        }}
-        numberOfLines={1}
-      >
-        {info.name}
-      </Text>
-    </View>
+const InfoColumn = ({ info }) => {
+  const shareUrl = `https://weebplay.glitch.me/?screen=watch&slug=${info.slug}`;
 
-    <View
-      style={{
-        flexDirection: "row",
-        alignItems: "center",
-        marginBottom: 5,
-      }}
-    >
-      <Text
+  const onShare = () => {
+    try {
+      Share.share({
+        message: `Nhấn vào đường dẫn để xem ${info.name}\n\n${shareUrl}`,
+        title: shareUrl,
+        url: shareUrl,
+      });
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  return (
+    <>
+      <View style={{ marginBottom: moderateScale(20) }}>
+        <Text
+          style={{
+            fontSize: moderateScale(16),
+            fontWeight: "bold",
+            color: "#E2610E",
+          }}
+          numberOfLines={1}
+        >
+          {info.name}
+        </Text>
+      </View>
+
+      <View
         style={{
-          fontSize: moderateScale(14),
-          fontWeight: "bold",
-          color: "white",
-          marginRight: moderateScale(20),
+          flexDirection: "row",
+          alignItems: "center",
+          marginBottom: 5,
         }}
-        numberOfLines={1}
       >
-        Thời lượng
-      </Text>
-      <Text
+        <Text
+          style={{
+            fontSize: moderateScale(14),
+            fontWeight: "bold",
+            color: "white",
+            marginRight: moderateScale(20),
+          }}
+          numberOfLines={1}
+        >
+          Thời lượng
+        </Text>
+        <Text
+          style={{
+            fontSize: moderateScale(12),
+            color: "gray",
+          }}
+          numberOfLines={1}
+        >
+          {info.time}
+        </Text>
+      </View>
+      <View
         style={{
-          fontSize: moderateScale(12),
-          color: "gray",
+          flex: 1,
+          flexDirection: "row",
+          alignItems: "center",
+          marginBottom: 5,
         }}
-        numberOfLines={1}
       >
-        {info.time}
-      </Text>
-    </View>
-    <View
-      style={{
-        flex: 1,
-        flexDirection: "row",
-        alignItems: "center",
-        marginBottom: 5,
-      }}
-    >
-      <Text
+        <Text
+          style={{
+            fontSize: moderateScale(14),
+            fontWeight: "bold",
+            color: "white",
+            marginRight: moderateScale(20),
+          }}
+          numberOfLines={1}
+        >
+          Lượt xem
+        </Text>
+        <Text
+          style={{
+            fontSize: moderateScale(12),
+            color: "gray",
+          }}
+          numberOfLines={1}
+        >
+          {numberWithCommas(info.views)} lượt xem
+        </Text>
+      </View>
+
+      <View
         style={{
-          fontSize: moderateScale(14),
-          fontWeight: "bold",
-          color: "white",
-          marginRight: moderateScale(20),
+          flex: 1,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-evenly",
+          marginTop: 20,
         }}
-        numberOfLines={1}
       >
-        Lượt xem
-      </Text>
-      <Text
-        style={{
-          fontSize: moderateScale(12),
-          color: "gray",
-        }}
-        numberOfLines={1}
-      >
-        {numberWithCommas(info.views)} lượt xem
-      </Text>
-    </View>
-  </>
-);
+        <InfoButton
+          title="Chia sẻ"
+          titleStyle={{ color: "rgba(255,255,255,0.75)" }}
+          icon={
+            <Entypo name="share" size={24} color="rgba(255,255,255,0.75)" />
+          }
+          onPress={onShare}
+        />
+      </View>
+    </>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
