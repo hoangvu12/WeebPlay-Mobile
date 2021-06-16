@@ -241,7 +241,7 @@ const Column = ({ as: Component = View, children, style }) => (
 );
 
 const InfoColumn = ({ info }) => {
-  const shareUrl = `https://weebplay.glitch.me/?screen=watch&slug=${info.slug}`;
+  const shareUrl = `https://weebplay.glitch.me/anime/linking?slug=${info.slug}`;
 
   const onShare = () => {
     try {

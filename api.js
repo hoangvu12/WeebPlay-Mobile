@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "https://vuighe-clone.glitch.me/api/v1/anime";
+const BASE_URL = "https://weebplay.glitch.me/api/v1/anime";
 
 class API {
   static async getAnimeList() {
