@@ -91,10 +91,9 @@ export function CardScreen({ slug }) {
 
   const handleEndReached = () => {
     if (isFetchingNextPage || isLoading || data.isEnd) {
-      return console.log("STOP FETCHING");
+      return;
     }
 
-    console.log("FETCHING", list.length);
     notifyMessage("Đang tải dữ liệu.");
     fetchNextPage();
   };
@@ -109,7 +108,6 @@ export function CardScreen({ slug }) {
         onEndReached={handleEndReached}
         onEndReachedThreshold={0.05}
         getItemLayout={getItemLayout}
-        // initialNumToRender={24}
         contentContainerStyle={{
           flexGrow: 1,
           alignItems: "center",

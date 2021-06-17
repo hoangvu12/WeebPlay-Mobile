@@ -4,7 +4,7 @@ import "react-native-gesture-handler";
 
 import BrowseScreen from "../screens/Browse";
 
-import { options } from "../screens";
+import { screenOptions } from "../navigation/stacks";
 
 const screens = [
   {
@@ -17,7 +17,7 @@ const Stack = createStackNavigator();
 
 export default function BrowseStackScreen() {
   return (
-    <Stack.Navigator initialRouteName="Browse" screenOptions={options}>
+    <Stack.Navigator initialRouteName="Browse" screenOptions={screenOptions}>
       {screens.map((screen) => (
         <Stack.Screen {...screen} key={screen.name} />
       ))}

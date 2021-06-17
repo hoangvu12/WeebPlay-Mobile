@@ -1,11 +1,21 @@
+/* eslint-disable react/display-name */
+
+import { AntDesign, Entypo } from "@expo/vector-icons";
 import React from "react";
-import { AntDesign } from "@expo/vector-icons";
-import { Entypo } from "@expo/vector-icons";
+import BrowseStackScreen from "../stacks/Browse";
+import HomeStackScreen from "../stacks/Home";
 
-import HomeStackScreen from "./stacks/Home";
-import BrowseStackScreen from "./stacks/Browse";
+export const screenOptions = {
+  activeTintColor: "#FF6500",
+  style: {
+    backgroundColor: "#000000",
+    borderTopWidth: 0,
+  },
 
-const tabs = [
+  showLabel: false,
+};
+
+export const screens = [
   {
     name: "Home",
     component: HomeStackScreen,
@@ -26,19 +36,9 @@ const tabs = [
   },
 ];
 
-export const tabScreenOptions = {
-  activeTintColor: "#FF6500",
-  style: {
-    backgroundColor: "#000000",
-    borderTopWidth: 0,
-  },
-
-  showLabel: false,
-};
-
-export const options = {
-  tabBarOptions: tabScreenOptions,
+const options = {
+  tabBarOptions: screenOptions,
   initialRouteName: "Home",
 };
 
-export default tabs;
+export default options;

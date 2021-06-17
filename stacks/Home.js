@@ -2,9 +2,9 @@ import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import "react-native-gesture-handler";
 
-import HomeScreen from "../screens/Home";
+import { screenOptions } from "../navigation/stacks";
 
-import { options } from "../screens";
+import HomeScreen from "../screens/Home";
 
 const screens = [
   {
@@ -17,7 +17,7 @@ const Stack = createStackNavigator();
 
 export default function HomeStackScreen() {
   return (
-    <Stack.Navigator initialRouteName="Home" screenOptions={options}>
+    <Stack.Navigator initialRouteName="Home" screenOptions={screenOptions}>
       {screens.map((screen) => (
         <Stack.Screen {...screen} key={screen.name} />
       ))}
