@@ -38,7 +38,7 @@ export default function Watch({ route }) {
 
   const navigation = useNavigation();
 
-  const getItemLayout = (data, index) => ({
+  const getItemLayout = (_, index) => ({
     length: CARD_HEIGHT,
     offset: CARD_HEIGHT * index,
     index,

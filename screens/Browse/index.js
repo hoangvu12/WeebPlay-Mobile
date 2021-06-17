@@ -69,19 +69,15 @@ export function CardScreen({ slug }) {
     useInfiniteQuery(
       [`animeType-${slug}`, slug],
       ({ pageParam, queryKey }) => {
-        const [key, slug] = queryKey;
+        // eslint-disable-next-line no-unused-vars
+        const [_, slug] = queryKey;
 
         return API.getAnimeListFromType(slug, pageParam || 1);
       },
       {
-        getNextPageParam: (lastPage, pages) => lastPage.nextPage,
+        getNextPageParam: (lastPage) => lastPage.nextPage,
       }
     );
-
-  const handleEndReached = () => {
-    notifyMessage("Đang tải dữ liệu.");
-    fetchNextPage();
-  };
 
   if (focusedTab !== slug) return <View></View>;
 
@@ -91,19 +87,29 @@ export function CardScreen({ slug }) {
   if (isLoading && !isFetchingNextPage) {
     return <LoadingLoader />; // use something like https://github.com/chramos/react-native-skeleton-placeholder
   }
+  const list = data.pages.map((page) => page.data).flat();
 
+  const handleEndReached = () => {
+    if (isFetchingNextPage || isLoading || data.isEnd) {
+      return console.log("STOP FETCHING");
+    }
+
+    console.log("FETCHING", list.length);
+    notifyMessage("Đang tải dữ liệu.");
+    fetchNextPage();
+  };
   return (
     <View style={{ flex: 1 }}>
       <Tabs.FlatList
         key={slug}
         numColumns={2}
-        data={data.pages.map((page) => page.data).flat()}
+        data={list}
         renderItem={renderItem}
         keyExtractor={(item, index) => index}
         onEndReached={handleEndReached}
-        onEndReachedThreshold={0.1}
+        onEndReachedThreshold={0.05}
         getItemLayout={getItemLayout}
-        initialNumToRender={24}
+        // initialNumToRender={24}
         contentContainerStyle={{
           flexGrow: 1,
           alignItems: "center",
