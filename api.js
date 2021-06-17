@@ -28,6 +28,12 @@ class API {
 
     return fetchData(URL);
   }
+
+  static async searchAnime(query, limit = 24) {
+    const URL = `${BASE_URL}/search?keyword=${query}&limit=${limit}`;
+
+    return fetchData(URL);
+  }
 }
 
 const fetchData = async (URL) => {
