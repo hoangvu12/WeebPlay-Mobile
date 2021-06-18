@@ -26,6 +26,18 @@ import { moderateScale } from "../../utils/scale";
 import OverlayButton from "./OverlayButton";
 
 const qualities = [
+  { width: 128, height: 96, name: "96p" },
+  { width: 160, height: 120, name: "120p" },
+  { width: 176, height: 144, name: "144p" },
+  { width: 256, height: 144, name: "144p" },
+  { width: 320, height: 180, name: "180p" },
+  { width: 320, height: 240, name: "240p" },
+  { width: 352, height: 240, name: "240p" },
+  { width: 426, height: 240, name: "240p" },
+  { width: 352, height: 288, name: "288p" },
+  { width: 480, height: 272, name: "272p" },
+  { width: 480, height: 360, name: "360p" },
+  { width: 640, height: 360, name: "360p" },
   {
     width: 640,
     height: 480,
@@ -87,7 +99,7 @@ export default function Video({
     );
 
     parsePlaylist(source).then((playlists) => {
-      const chosenPlaylist = playlists.find((playlist) => {
+      let chosenPlaylist = playlists.find((playlist) => {
         const { width: playlistWidth, height: playlistHeight } =
           playlist.attributes.RESOLUTION;
 
@@ -96,14 +108,17 @@ export default function Video({
         );
       });
 
+      // If there is no playlist found, grab first one.
+      if (!chosenPlaylist) chosenPlaylist = playlists[0];
+
       setCurrentPlaylist(chosenPlaylist);
       setPlaylists(playlists);
     });
-  }, []);
+  }, [source]);
 
   // Update video status every second
   // because expo video somehow doesn't update status itself
-  // when change videoSource
+  // when change video source
   useEffect(() => {
     let interval = setInterval(async () => {
       try {
@@ -111,7 +126,7 @@ export default function Video({
 
         setStatus(status);
       } catch (err) {
-        // console.log("ERROR");
+        console.log("ERROR");
       }
     }, 1000);
 

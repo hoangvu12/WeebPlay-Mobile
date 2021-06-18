@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dimensions,
   FlatList,
@@ -14,11 +14,32 @@ import AnimeCard, { CARD_HEIGHT } from "../../shared/AnimeCard";
 import { LoadingLoader, WarningLoader } from "../../shared/Loader";
 import Section from "../../shared/Section";
 import { moderateScale } from "../../utils/scale";
+import Storage from "../../utils/Storage";
 import CarouselCard from "./AnimeCarouselCard";
 
 const { width: screenWidth } = Dimensions.get("screen");
 
+const storageKey = "recently-watched";
+
 export default function Home({ navigation }) {
+  const [recentlyWatched, setRecentlyWatched] = useState([]);
+  const [isFetchingData, setIsFetchingData] = useState(false);
+
+  useEffect(() => {
+    const getData = async () => {
+      setIsFetchingData(true);
+
+      // Storage.clear();
+
+      const items = await Storage.find(storageKey);
+
+      setRecentlyWatched(items);
+      setIsFetchingData(false);
+    };
+
+    getData();
+  }, []);
+
   const { isLoading, isError, data } = useQuery("animeList", API.getAnimeList);
 
   const getItemLayout = (data, index) => ({
@@ -43,7 +64,7 @@ export default function Home({ navigation }) {
     />
   );
 
-  if (isLoading) {
+  if (isLoading || isFetchingData) {
     return <LoadingLoader />;
   }
 
@@ -52,6 +73,7 @@ export default function Home({ navigation }) {
   }
 
   const sections = [
+    { title: "Xem gần đây", items: recentlyWatched },
     { title: "Mới cập nhật", items: data.latest },
     { title: "Anime đề cử", items: data.recommended },
   ];
@@ -76,22 +98,26 @@ export default function Home({ navigation }) {
 
       <View style={{ flex: 2 }}>
         <ScrollView>
-          {sections.map((section, index) => (
-            <Section
-              style={{ marginBottom: moderateScale(20) }}
-              title={section.title}
-              key={index}
-            >
-              <FlatList
-                horizontal
-                data={section.items}
-                renderItem={renderSectionItem}
-                keyExtractor={(item) => item.slug}
-                getItemLayout={getItemLayout}
-                initialNumToRender={12}
-              />
-            </Section>
-          ))}
+          {sections.map((section) => {
+            return (
+              section.items.length !== 0 && (
+                <Section
+                  style={{ marginBottom: moderateScale(20) }}
+                  title={section.title}
+                  key={section.title}
+                >
+                  <FlatList
+                    horizontal
+                    data={section.items}
+                    renderItem={renderSectionItem}
+                    keyExtractor={(item) => item.slug}
+                    getItemLayout={getItemLayout}
+                    initialNumToRender={12}
+                  />
+                </Section>
+              )
+            );
+          })}
         </ScrollView>
       </View>
     </View>

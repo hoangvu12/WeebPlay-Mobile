@@ -3,7 +3,8 @@
 import { Entypo } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/core";
 import { StatusBar } from "expo-status-bar";
-import React, { useCallback, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { useCallback, useState, useEffect } from "react";
 import {
   FlatList,
   ScrollView,
@@ -22,11 +23,16 @@ import {
   LoadingLoader,
   WarningLoader,
 } from "../../shared/Loader";
+
 import { numberWithCommas } from "../../utils";
 import { moderateScale } from "../../utils/scale";
+import Storage from "../../utils/Storage";
+
 import Column from "./Column";
 import InfoButton from "./InfoButton";
 import Video from "./Video";
+
+const storageKey = "recently-watched";
 
 export default function Watch({ route }) {
   const [episode, setEpisode] = useState(1);
@@ -35,6 +41,37 @@ export default function Watch({ route }) {
   const { slug } = route.params;
 
   const navigation = useNavigation();
+
+  useEffect(() => {
+    const setStoredEpisode = async () => {
+      try {
+        const storedData = await Storage.findOne(storageKey, { slug });
+
+        // if object is not empty
+        if (JSON.stringify(storedData) !== "{}") {
+          setEpisode(storedData.episode);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    setStoredEpisode();
+  }, []);
+
+  useEffect(() => {
+    const storeData = async () => {
+      try {
+        const data = { ...route.params, episode };
+
+        await Storage.update(storageKey, { slug }, data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    storeData();
+  }, [episode]);
 
   const getItemLayout = (_, index) => ({
     length: CARD_HEIGHT,

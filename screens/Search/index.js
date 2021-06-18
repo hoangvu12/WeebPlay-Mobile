@@ -23,8 +23,6 @@ export default function Search({ navigation }) {
 
     const data = await API.searchAnime(searchQuery);
 
-    // console.log(data);
-
     setSearchResults(data);
     setIsLoading(false);
   };
