@@ -87,7 +87,7 @@ export default function Search({ navigation }) {
             numColumns={2}
             data={searchResults}
             renderItem={renderItem}
-            keyExtractor={(item, index) => item.id}
+            keyExtractor={(item) => item.id}
             getItemLayout={getItemLayout}
             contentContainerStyle={{
               flexGrow: 1,

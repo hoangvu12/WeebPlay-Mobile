@@ -110,7 +110,7 @@ export default function Home({ navigation }) {
                     horizontal
                     data={section.items}
                     renderItem={renderSectionItem}
-                    keyExtractor={(item) => item.slug}
+                    keyExtractor={(item, index) => index.toString()}
                     getItemLayout={getItemLayout}
                     initialNumToRender={12}
                   />
