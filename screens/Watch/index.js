@@ -52,7 +52,7 @@ export default function Watch({ route }) {
           setEpisode(storedData.episode);
         }
       } catch (err) {
-        console.log(err);
+        // console.log(err);
       }
     };
 
@@ -66,7 +66,7 @@ export default function Watch({ route }) {
 
         await Storage.update(storageKey, { slug }, data);
       } catch (err) {
-        console.log(err);
+        // console.log(err);
       }
     };
 

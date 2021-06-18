@@ -7,9 +7,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "eject": "expo eject",
-    "postinstall": "yarn run infinite-flatlist-patch",
-    "postuninstall": "yarn run infinite-flatlist-patch"
+    "eject": "expo eject"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.13.0",
@@ -45,8 +43,7 @@
   "devDependencies": {
     "@babel/core": "^7.9.0",
     "eslint": "^7.28.0",
-    "eslint-plugin-react": "^7.24.0",
-    "react-native-infinite-flatlist-patch": "^1.0.8"
+    "eslint-plugin-react": "^7.24.0"
   },
   "private": true
 }

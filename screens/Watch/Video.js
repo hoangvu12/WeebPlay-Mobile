@@ -126,7 +126,7 @@ export default function Video({
 
         setStatus(status);
       } catch (err) {
-        console.log("ERROR");
+        // console.log("ERROR", err);
       }
     }, 1000);
 
