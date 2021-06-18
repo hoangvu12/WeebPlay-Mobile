@@ -4,6 +4,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import * as Linking from "expo-linking";
 import React from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
+import { Provider as PaperProvider } from "react-native-paper";
 
 import { LoadingLoader } from "./shared/Loader";
 
@@ -44,19 +45,21 @@ export default function App() {
   };
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <NavigationContainer linking={linking} fallback={<LoadingLoader />}>
-        <Stack.Navigator {...stackOptions}>
-          <Stack.Screen
-            name="Tabs"
-            component={Tabs}
-            options={{ headerShown: false }}
-          />
-          {stackScreens.map((screen) => (
-            <Stack.Screen {...screen} key={screen.name} />
-          ))}
-        </Stack.Navigator>
-      </NavigationContainer>
-    </QueryClientProvider>
+    <PaperProvider>
+      <QueryClientProvider client={queryClient}>
+        <NavigationContainer linking={linking} fallback={<LoadingLoader />}>
+          <Stack.Navigator {...stackOptions}>
+            <Stack.Screen
+              name="Tabs"
+              component={Tabs}
+              options={{ headerShown: false }}
+            />
+            {stackScreens.map((screen) => (
+              <Stack.Screen {...screen} key={screen.name} />
+            ))}
+          </Stack.Navigator>
+        </NavigationContainer>
+      </QueryClientProvider>
+    </PaperProvider>
   );
 }
