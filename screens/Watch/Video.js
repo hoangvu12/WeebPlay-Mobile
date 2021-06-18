@@ -19,7 +19,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import { Dialog, Portal, RadioButton } from "react-native-paper";
+import { Dialog, Portal, RadioButton, Button } from "react-native-paper";
 import useOrientation from "../../hooks/useOrientation";
 import { LoadingLoader } from "../../shared/Loader";
 import { moderateScale } from "../../utils/scale";
@@ -221,6 +221,9 @@ export default function Video({
               );
             })}
           </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={hideDialog}>Xong</Button>
+          </Dialog.Actions>
         </Dialog>
       </Portal>
       <TouchableWithoutFeedback onPressIn={handleScreenTouch}>
