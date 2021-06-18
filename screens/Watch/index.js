@@ -1,34 +1,32 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
+import { Entypo } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/core";
 import { StatusBar } from "expo-status-bar";
 import React, { useCallback, useState } from "react";
 import {
+  FlatList,
   ScrollView,
+  Share,
   StyleSheet,
   Text,
   View,
-  FlatList,
-  Share,
 } from "react-native";
 import { useQuery, useQueryClient } from "react-query";
-import { Entypo } from "@expo/vector-icons";
-
 import API from "../../api";
+import { windowWidth } from "../../constants";
 import useOrientation from "../../hooks/useOrientation";
-
 import AnimeCard, { CARD_HEIGHT } from "../../shared/AnimeCard";
 import {
+  DialogLoader,
   LoadingLoader,
   WarningLoader,
-  DialogLoader,
 } from "../../shared/Loader";
-
 import { numberWithCommas } from "../../utils";
 import { moderateScale } from "../../utils/scale";
-
-import Video from "./Video";
+import Column from "./Column";
 import InfoButton from "./InfoButton";
+import Video from "./Video";
 
 export default function Watch({ route }) {
   const [episode, setEpisode] = useState(1);
@@ -174,7 +172,12 @@ export default function Watch({ route }) {
       {orientation !== "LANDSCAPE" && (
         <View style={styles.infoContainer}>
           <ScrollView horizontal style={{ flex: 1 }}>
-            <Column as={ScrollView}>
+            <Column
+              as={ScrollView}
+              style={{
+                width: windowWidth - moderateScale(50),
+              }}
+            >
               <InfoColumn info={animeInfo} />
             </Column>
 
@@ -235,10 +238,6 @@ export default function Watch({ route }) {
     </View>
   );
 }
-
-const Column = ({ as: Component = View, children, style }) => (
-  <Component style={[styles.column, style]}>{children}</Component>
-);
 
 const InfoColumn = ({ info }) => {
   const shareUrl = `https://weebplay.glitch.me/anime/linking?slug=${info.slug}`;
@@ -359,9 +358,5 @@ const styles = StyleSheet.create({
   },
   infoContainer: {
     flex: 2,
-  },
-  column: {
-    flex: 1,
-    padding: moderateScale(20),
   },
 });

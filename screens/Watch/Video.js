@@ -19,13 +19,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import {
-  Button,
-  Paragraph,
-  Dialog,
-  Portal,
-  RadioButton,
-} from "react-native-paper";
+import { Dialog, Portal, RadioButton } from "react-native-paper";
 import useOrientation from "../../hooks/useOrientation";
 import { LoadingLoader } from "../../shared/Loader";
 import { moderateScale } from "../../utils/scale";
@@ -181,8 +175,17 @@ export default function Video({
   return (
     <>
       <Portal>
-        <Dialog visible={dialogVisible} onDismiss={hideDialog}>
-          <Dialog.Title>Chọn chất lượng</Dialog.Title>
+        <Dialog
+          visible={dialogVisible}
+          onDismiss={hideDialog}
+          style={{
+            backgroundColor: "#202020",
+            borderRadius: 10,
+          }}
+        >
+          <Dialog.Title style={{ color: "white" }}>
+            Chọn chất lượng
+          </Dialog.Title>
           <Dialog.Content>
             {playlists.map((playlist) => {
               const { width: playlistWidth, height: playlistHeight } =
@@ -206,10 +209,14 @@ export default function Video({
                         ? "checked"
                         : "unchecked"
                     }
+                    color="#FF6500"
+                    uncheckedColor="gray"
                     onPress={() => setCurrentPlaylist(playlist)}
                   />
 
-                  <Text>{quality.name}</Text>
+                  <Text style={{ color: "white", fontSize: moderateScale(15) }}>
+                    {quality.name}
+                  </Text>
                 </View>
               );
             })}
