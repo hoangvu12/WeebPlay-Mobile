@@ -131,15 +131,15 @@ export default function Video({
   const handleScreenTouch = useCallback(() => {
     setShowOverlay(!showOverlay);
 
-    // // If there is timeout, clear it
-    // if (timeoutLeave.current) {
-    //   clearTimeout(timeoutLeave.current);
-    // }
+    // If there is timeout, clear it
+    if (timeoutLeave.current) {
+      clearTimeout(timeoutLeave.current);
+    }
 
-    // // If user don't click the screen ever again, then hide controls
-    // timeoutLeave.current = setTimeout(() => {
-    //   setShowOverlay(false);
-    // }, 3000);
+    // If user don't click the screen ever again, then hide controls
+    timeoutLeave.current = setTimeout(() => {
+      setShowOverlay(false);
+    }, 3000);
   }, [showOverlay]);
 
   const handleSlideDrag = useCallback(async (value) => {
