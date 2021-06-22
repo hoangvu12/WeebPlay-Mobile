@@ -69,11 +69,13 @@ export default function Video({
   const video = useRef(null);
   const DOMAIN = useRef(null);
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
   const [playlists, setPlaylists] = useState([]);
   const [currentPlaylist, setCurrentPlaylist] = useState({});
   const [videoSource, setVideoSource] = useState("");
   const [status, setStatus] = useState({});
-  const [dialogVisible, setDialogVisible] = React.useState(false);
+  const [dialogVisible, setDialogVisible] = useState(false);
 
   const [showOverlay, setShowOverlay] = useState(true);
   const [showControls] = useState(true);
@@ -82,11 +84,9 @@ export default function Video({
   const orientation = useOrientation();
 
   useEffect(() => {
-    const { uri = "" } = currentPlaylist;
+    if (!currentPlaylist?.uri) return;
 
-    if (!uri) return;
-
-    const videoSource = `https://${DOMAIN.current}${uri}`;
+    const videoSource = `https://${DOMAIN.current}${currentPlaylist.uri}`;
 
     setVideoSource(videoSource);
   }, [currentPlaylist]);
@@ -98,22 +98,28 @@ export default function Video({
       (quality) => quality.name === initialQuality
     );
 
-    parsePlaylist(source).then((playlists) => {
-      let chosenPlaylist = playlists.find((playlist) => {
-        const { width: playlistWidth, height: playlistHeight } =
-          playlist.attributes.RESOLUTION;
+    setIsLoading(true);
 
-        return (
-          initialWidth === playlistWidth && initialHeight === playlistHeight
-        );
-      });
+    parsePlaylist(source)
+      .then((playlists) => {
+        setIsLoading(false);
 
-      // If there is no playlist found, grab first one.
-      if (!chosenPlaylist) chosenPlaylist = playlists[0];
+        let chosenPlaylist = playlists.find((playlist) => {
+          const { width: playlistWidth, height: playlistHeight } =
+            playlist.attributes.RESOLUTION;
 
-      setCurrentPlaylist(chosenPlaylist);
-      setPlaylists(playlists);
-    });
+          return (
+            initialWidth === playlistWidth && initialHeight === playlistHeight
+          );
+        });
+
+        // If there is no playlist found, grab first one.
+        if (!chosenPlaylist) chosenPlaylist = playlists[0];
+
+        setCurrentPlaylist(chosenPlaylist);
+        setPlaylists(playlists);
+      })
+      .catch(() => setIsError(true));
   }, [source]);
 
   // Update video status every second
@@ -185,7 +191,8 @@ export default function Video({
 
   const navigation = useNavigation();
 
-  if (!videoSource) return <LoadingLoader />;
+  if (!videoSource || isLoading) return <LoadingLoader />;
+  if (isError) return <WarningLoader />;
 
   return (
     <>

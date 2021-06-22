@@ -1,21 +1,11 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import { Entypo } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/core";
 import { StatusBar } from "expo-status-bar";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useCallback, useState, useEffect } from "react";
-import {
-  FlatList,
-  ScrollView,
-  Share,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import { FlatList, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useQuery, useQueryClient } from "react-query";
 import API from "../../api";
-import { windowWidth } from "../../constants";
 import useOrientation from "../../hooks/useOrientation";
 import AnimeCard, { CARD_HEIGHT } from "../../shared/AnimeCard";
 import {
@@ -23,13 +13,12 @@ import {
   LoadingLoader,
   WarningLoader,
 } from "../../shared/Loader";
-
-import { numberWithCommas } from "../../utils";
 import { moderateScale } from "../../utils/scale";
 import Storage from "../../utils/Storage";
-
 import Column from "./Column";
-import InfoButton from "./InfoButton";
+import CommentsColumn from "./CommentsColumn";
+import InfoColumn from "./InfoColumn";
+import ListColumn from "./ListColumn";
 import Video from "./Video";
 
 const storageKey = "recently-watched";
@@ -209,182 +198,47 @@ export default function Watch({ route }) {
       {orientation !== "LANDSCAPE" && (
         <View style={styles.infoContainer}>
           <ScrollView horizontal style={{ flex: 1 }}>
-            <Column
-              as={ScrollView}
-              style={{
-                width: windowWidth - moderateScale(50),
-              }}
-            >
-              <InfoColumn info={animeInfo} />
-            </Column>
+            {/* Anime info column */}
+            <InfoColumn info={animeInfo} />
 
-            <Column>
-              <Text
-                style={{
-                  color: "white",
-                  fontSize: moderateScale(18),
-                  fontWeight: "bold",
-                  paddingBottom: 14,
-                }}
-              >
-                Tập phim
-              </Text>
+            {/* Episode column */}
+            <ListColumn
+              key="episodes"
+              numColumns={2}
+              data={animeInfo.episodes.slice(0, showNumber)}
+              renderItem={handleEpisodeItem}
+              keyExtractor={(item) => item.id.toString()}
+              onEndReached={handleEndReached}
+              onEndReachedThreshold={1}
+              initialNumToRender={12}
+              getItemLayout={getItemLayout}
+              columnWrapperStyle={{ flex: 1, justifyContent: "center" }}
+              title="Tập phim"
+            />
 
-              <FlatList
-                key="episodes"
+            {/* Recommended anime list column */}
+            {animeList && (
+              <ListColumn
+                key="recommended"
                 numColumns={2}
-                data={animeInfo.episodes.slice(0, showNumber)}
-                renderItem={handleEpisodeItem}
-                keyExtractor={(item) => item.id}
-                onEndReached={handleEndReached}
-                onEndReachedThreshold={1}
+                data={animeList.recommended}
+                renderItem={handleAnimeItem}
+                keyExtractor={(item) => item.id.toString()}
                 initialNumToRender={12}
                 getItemLayout={getItemLayout}
                 columnWrapperStyle={{ flex: 1, justifyContent: "center" }}
+                title="Hôm nay xem gì"
               />
-            </Column>
-
-            {animeList && (
-              <Column>
-                <Text
-                  style={{
-                    color: "white",
-                    fontSize: moderateScale(18),
-                    fontWeight: "bold",
-                    paddingBottom: 14,
-                  }}
-                >
-                  Hôm nay xem gì
-                </Text>
-
-                <FlatList
-                  key="recommended"
-                  numColumns={2}
-                  data={animeList.recommended}
-                  renderItem={handleAnimeItem}
-                  keyExtractor={(item) => item.id}
-                  initialNumToRender={12}
-                  getItemLayout={getItemLayout}
-                  columnWrapperStyle={{ flex: 1, justifyContent: "center" }}
-                />
-              </Column>
             )}
+
+            {/* Comments column */}
+            <CommentsColumn info={animeInfo} />
           </ScrollView>
         </View>
       )}
     </View>
   );
 }
-
-const InfoColumn = ({ info }) => {
-  const shareUrl = `https://weebplay.glitch.me/anime/linking?slug=${info.slug}`;
-
-  const onShare = () => {
-    try {
-      Share.share({
-        message: `Nhấn vào đường dẫn để xem ${info.name}\n\n${shareUrl}`,
-        title: shareUrl,
-        url: shareUrl,
-      });
-    } catch (error) {
-      alert(error.message);
-    }
-  };
-
-  return (
-    <>
-      <View style={{ marginBottom: moderateScale(20) }}>
-        <Text
-          style={{
-            fontSize: moderateScale(16),
-            fontWeight: "bold",
-            color: "#E2610E",
-          }}
-          numberOfLines={1}
-        >
-          {info.name}
-        </Text>
-      </View>
-
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          marginBottom: 5,
-        }}
-      >
-        <Text
-          style={{
-            fontSize: moderateScale(14),
-            fontWeight: "bold",
-            color: "white",
-            marginRight: moderateScale(20),
-          }}
-          numberOfLines={1}
-        >
-          Thời lượng
-        </Text>
-        <Text
-          style={{
-            fontSize: moderateScale(12),
-            color: "gray",
-          }}
-          numberOfLines={1}
-        >
-          {info.time}
-        </Text>
-      </View>
-      <View
-        style={{
-          flex: 1,
-          flexDirection: "row",
-          alignItems: "center",
-          marginBottom: 5,
-        }}
-      >
-        <Text
-          style={{
-            fontSize: moderateScale(14),
-            fontWeight: "bold",
-            color: "white",
-            marginRight: moderateScale(20),
-          }}
-          numberOfLines={1}
-        >
-          Lượt xem
-        </Text>
-        <Text
-          style={{
-            fontSize: moderateScale(12),
-            color: "gray",
-          }}
-          numberOfLines={1}
-        >
-          {numberWithCommas(info.views)} lượt xem
-        </Text>
-      </View>
-
-      <View
-        style={{
-          flex: 1,
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-evenly",
-          marginTop: 20,
-        }}
-      >
-        <InfoButton
-          title="Chia sẻ"
-          titleStyle={{ color: "rgba(255,255,255,0.75)" }}
-          icon={
-            <Entypo name="share" size={24} color="rgba(255,255,255,0.75)" />
-          }
-          onPress={onShare}
-        />
-      </View>
-    </>
-  );
-};
 
 const styles = StyleSheet.create({
   container: {

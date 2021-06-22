@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useNavigation } from "@react-navigation/native";
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { Dimensions, View } from "react-native";
 import {
   MaterialTabBar,
@@ -37,6 +37,8 @@ const genres = [
 ];
 
 export function CardScreen({ slug }) {
+  const [isFetchable, setIsFetchable] = useState(true);
+
   const navigation = useNavigation();
 
   const focusedTab = useFocusedTab();
@@ -67,15 +69,22 @@ export function CardScreen({ slug }) {
 
   const { data, isError, isLoading, isFetchingNextPage, fetchNextPage } =
     useInfiniteQuery(
-      [`animeType-${slug}`, slug],
-      ({ pageParam, queryKey }) => {
+      ["animeType", slug],
+      ({ pageParam = { nextPage: 1, isEnd: false }, queryKey }) => {
+        const { nextPage, isEnd } = pageParam;
+
+        if (isEnd) setIsFetchable(false);
+
         // eslint-disable-next-line no-unused-vars
         const [_, slug] = queryKey;
 
-        return API.getAnimeListFromType(slug, pageParam || 1);
+        return API.getAnimeListFromType(slug, nextPage);
       },
       {
-        getNextPageParam: (lastPage) => lastPage.nextPage,
+        getNextPageParam: (lastPage) => ({
+          nextPage: lastPage.nextPage,
+          isEnd: lastPage.isEnd,
+        }),
       }
     );
 
@@ -90,7 +99,7 @@ export function CardScreen({ slug }) {
   const list = data.pages.map((page) => page.data).flat();
 
   const handleEndReached = () => {
-    if (isFetchingNextPage || isLoading || data.isEnd) {
+    if (isFetchingNextPage || isLoading || !isFetchable) {
       return;
     }
 

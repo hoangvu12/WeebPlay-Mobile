@@ -34,6 +34,12 @@ class API {
 
     return fetchData(URL);
   }
+
+  static async getComments(animeId, page = 1) {
+    const URL = `${BASE_URL}/${animeId}/comments/page/${page}`;
+
+    return fetchData(URL);
+  }
 }
 
 const fetchData = async (URL) => {
