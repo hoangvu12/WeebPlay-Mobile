@@ -29,11 +29,9 @@ export default function Home({ navigation }) {
     const getData = async () => {
       setIsFetchingData(true);
 
-      // Storage.clear();
-
       const items = await Storage.find(storageKey);
 
-      setRecentlyWatched(items);
+      setRecentlyWatched(items.reverse());
       setIsFetchingData(false);
     };
 
