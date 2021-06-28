@@ -20,8 +20,10 @@ import {
   View,
 } from "react-native";
 import { Dialog, Portal, RadioButton, Button } from "react-native-paper";
+import { activateKeepAwake, deactivateKeepAwake } from "expo-keep-awake";
+
 import useOrientation from "../../hooks/useOrientation";
-import { LoadingLoader } from "../../shared/Loader";
+import { LoadingLoader, WarningLoader } from "../../shared/Loader";
 import { moderateScale } from "../../utils/scale";
 import OverlayButton from "./OverlayButton";
 
@@ -84,6 +86,15 @@ export default function Video({
   const orientation = useOrientation();
 
   useEffect(() => {
+    if (orientation === "LANDSCAPE") {
+      activateKeepAwake();
+      return;
+    }
+
+    deactivateKeepAwake();
+  }, [orientation]);
+
+  useEffect(() => {
     if (!currentPlaylist?.uri) return;
 
     const videoSource = `https://${DOMAIN.current}${currentPlaylist.uri}`;
@@ -91,7 +102,7 @@ export default function Video({
     setVideoSource(videoSource);
   }, [currentPlaylist]);
 
-  // Parse the playlist
+  // Parse the playlist for qualities
   useEffect(() => {
     DOMAIN.current = source.split("/")[2];
     const { width: initialWidth, height: initialHeight } = qualities.find(
@@ -127,13 +138,11 @@ export default function Video({
   // when change video source
   useEffect(() => {
     let interval = setInterval(async () => {
-      try {
-        const status = await video.current.getStatusAsync();
+      const status = await video.current
+        .getStatusAsync()
+        .catch((err) => console.log(err));
 
-        setStatus(status);
-      } catch (err) {
-        // console.log("ERROR", err);
-      }
+      setStatus(status);
     }, 1000);
 
     return () => clearInterval(interval);

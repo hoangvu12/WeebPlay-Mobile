@@ -26,6 +26,19 @@ const Tabs = () => (
   </Tab.Navigator>
 );
 
+const Stacks = () => (
+  <Stack.Navigator {...stackOptions}>
+    <Stack.Screen
+      name="Tabs"
+      component={Tabs}
+      options={{ headerShown: false }}
+    />
+    {stackScreens.map((screen) => (
+      <Stack.Screen {...screen} key={screen.name} />
+    ))}
+  </Stack.Navigator>
+);
+
 export default function App() {
   const config = {
     screens: {
@@ -48,16 +61,7 @@ export default function App() {
     <PaperProvider>
       <QueryClientProvider client={queryClient}>
         <NavigationContainer linking={linking} fallback={<LoadingLoader />}>
-          <Stack.Navigator {...stackOptions}>
-            <Stack.Screen
-              name="Tabs"
-              component={Tabs}
-              options={{ headerShown: false }}
-            />
-            {stackScreens.map((screen) => (
-              <Stack.Screen {...screen} key={screen.name} />
-            ))}
-          </Stack.Navigator>
+          <Stacks />
         </NavigationContainer>
       </QueryClientProvider>
     </PaperProvider>
