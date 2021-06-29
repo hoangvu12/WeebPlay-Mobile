@@ -3,8 +3,10 @@
 import { useNavigation } from "@react-navigation/core";
 import { StatusBar } from "expo-status-bar";
 import React, { useCallback, useEffect, useState } from "react";
-import { FlatList, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { useQuery, useQueryClient } from "react-query";
+import { FlatList } from "react-native-gesture-handler";
+
 import API from "../../api";
 import useOrientation from "../../hooks/useOrientation";
 import AnimeCard, { CARD_HEIGHT } from "../../shared/AnimeCard";
@@ -13,9 +15,7 @@ import {
   LoadingLoader,
   WarningLoader,
 } from "../../shared/Loader";
-import { moderateScale } from "../../utils/scale";
 import Storage from "../../utils/Storage";
-import Column from "./Column";
 import CommentsColumn from "./CommentsColumn";
 import InfoColumn from "./InfoColumn";
 import ListColumn from "./ListColumn";
@@ -193,6 +193,21 @@ export default function Watch({ route }) {
           onNextPress={handleNextPress}
           previousButtonDisable={episode <= 1}
           nextButtonDisable={episode >= animeInfo.episodes.length}
+          bottomRender={
+            <FlatList
+              data={animeInfo.episodes.slice(0, showNumber)}
+              renderItem={handleEpisodeItem}
+              keyExtractor={(item) => item.id.toString()}
+              onEndReached={handleEndReached}
+              onEndReachedThreshold={1}
+              initialNumToRender={12}
+              getItemLayout={getItemLayout}
+              contentContainerStyle={{ flexGrow: 1, paddingBottom: 5 }}
+              horizontal
+            />
+          }
+          bottomHeight={CARD_HEIGHT + 70}
+          bottomStyle={{ padding: 10 }}
         />
       </View>
       <View
