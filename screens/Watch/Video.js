@@ -80,7 +80,6 @@ export default function Video({
   const [dialogVisible, setDialogVisible] = useState(false);
 
   const [showOverlay, setShowOverlay] = useState(true);
-  const [showControls] = useState(true);
   const timeoutLeave = useRef(null);
 
   const orientation = useOrientation();
@@ -276,233 +275,221 @@ export default function Video({
             }
             onPlaybackStatusUpdate={(status) => setStatus(status)}
           />
-          {showOverlay && (
-            <View style={styles.overlayContainer}>
-              {/* Top */}
-              <View style={styles.topOverlayContainer}>
-                <View
-                  style={{
-                    flex: 3,
-                    flexDirection: "row",
-                    alignItems: "baseline",
-                  }}
-                >
-                  <OverlayButton
-                    icon={
-                      <AntDesign
-                        name={orientation === "LANDSCAPE" ? "down" : "left"}
-                        size={moderateScale(23)}
-                        color="white"
-                        style={{ marginRight: moderateScale(12) }}
-                      />
-                    }
-                    onPress={() => {
-                      if (orientation !== "LANDSCAPE") {
-                        if (navigation.canGoBack()) {
-                          navigation.goBack();
-                        } else {
-                          navigation.reset({
-                            index: 0,
-                            routes: [{ name: "Tabs" }], // Home screen
-                          });
-                        }
+
+          <View
+            style={[styles.overlayContainer, { opacity: showOverlay ? 1 : 0 }]}
+          >
+            {/* Top */}
+            <View style={styles.topOverlayContainer}>
+              <View
+                style={{
+                  flex: 3,
+                  flexDirection: "row",
+                  alignItems: "baseline",
+                }}
+              >
+                <OverlayButton
+                  icon={
+                    <AntDesign
+                      name={orientation === "LANDSCAPE" ? "down" : "left"}
+                      size={moderateScale(23)}
+                      color="white"
+                      style={{ marginRight: moderateScale(12) }}
+                    />
+                  }
+                  onPress={() => {
+                    if (orientation !== "LANDSCAPE") {
+                      if (navigation.canGoBack()) {
+                        navigation.goBack();
                       } else {
-                        ScreenOrientation.lockAsync(
-                          ScreenOrientation.OrientationLock.PORTRAIT
-                        );
+                        navigation.reset({
+                          index: 0,
+                          routes: [{ name: "Tabs" }], // Home screen
+                        });
                       }
-                    }}
-                  />
-
-                  {isTopOverlayEnabled && (
-                    <>
-                      <Text
-                        numberOfLines={1}
-                        style={{
-                          color: "white",
-                          fontSize: moderateScale(14),
-                          marginRight: moderateScale(7),
-                        }}
-                      >
-                        {topOverlayTitle}
-                      </Text>
-
-                      <Text
-                        numberOfLines={1}
-                        style={{ color: "gray", fontSize: moderateScale(12) }}
-                      >
-                        {topOverlayDescription}
-                      </Text>
-                    </>
-                  )}
-                </View>
-
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: "row",
-                    alignItems: "baseline",
-                    justifyContent: "flex-end",
-                  }}
-                >
-                  <OverlayButton
-                    icon={
-                      <Entypo
-                        name="dots-three-vertical"
-                        size={moderateScale(23)}
-                        color="white"
-                      />
+                    } else {
+                      ScreenOrientation.lockAsync(
+                        ScreenOrientation.OrientationLock.PORTRAIT
+                      );
                     }
-                    onPress={showDialog}
-                  />
-                </View>
-              </View>
+                  }}
+                  disabled={!showOverlay}
+                />
 
-              {/* Middle */}
-              <View style={styles.middleOverlayContainer}>
-                {showControls && (
+                {isTopOverlayEnabled && (
                   <>
-                    {/* Previous button */}
-
-                    <OverlayButton
-                      icon={
-                        <MaterialCommunityIcons
-                          name="rewind"
-                          size={moderateScale(30)}
-                          color={previousButtonDisable ? "gray" : "white"}
-                        />
-                      }
-                      disabled={previousButtonDisable}
-                      onPress={handlePreviousPress}
-                    />
-
-                    {/* Seek left button */}
-                    <OverlayButton
-                      icon={
-                        <MaterialIcons
-                          name="replay"
-                          size={moderateScale(30)}
-                          color="white"
-                        />
-                      }
-                      onPress={handleSeekLeftPress}
-                    />
-
-                    {/* Play button */}
-                    <OverlayButton
-                      icon={
-                        status.isBuffering && !status.isPlaying ? (
-                          <ActivityIndicator
-                            size={moderateScale(80)}
-                            color="rgba(250,250,250,0.8)"
-                          />
-                        ) : (
-                          <MaterialIcons
-                            name={status.isPlaying ? "pause" : "play-arrow"}
-                            size={moderateScale(80)}
-                            color="white"
-                            iconStyle={{
-                              borderWidth: 10,
-                              borderColor: "black",
-                            }}
-                          />
-                        )
-                      }
-                      onPress={handlePlayPress}
-                    />
-
-                    {/* Seek right */}
-                    <OverlayButton
-                      icon={
-                        <MaterialIcons
-                          name="replay"
-                          size={moderateScale(30)}
-                          color="white"
-                          style={{ transform: [{ rotateY: "180deg" }] }}
-                        />
-                      }
-                      onPress={handleSeekRightPress}
-                    />
-
-                    {/* Next button */}
-                    <OverlayButton
-                      icon={
-                        <Entypo
-                          name="controller-fast-forward"
-                          size={moderateScale(30)}
-                          color={nextButtonDisable ? "gray" : "white"}
-                        />
-                      }
-                      disabled={nextButtonDisable}
-                      onPress={handleNextPress}
-                    />
-                  </>
-                )}
-              </View>
-
-              {/* Bottom */}
-              <View style={styles.bottomOverlayContainer}>
-                {showControls && (
-                  <>
-                    <View
-                      style={{ flexDirection: "row", alignItems: "center" }}
-                    >
-                      <Text
-                        style={{
-                          color: "white",
-                          marginLeft: moderateScale(5),
-                          fontSize: moderateScale(14),
-                        }}
-                      >
-                        {parseTime(status.positionMillis)}
-                      </Text>
-                    </View>
-
-                    <View
+                    <Text
+                      numberOfLines={1}
                       style={{
-                        flexDirection: "row",
-                        alignItems: "center",
+                        color: "white",
+                        fontSize: moderateScale(14),
+                        marginRight: moderateScale(7),
                       }}
                     >
-                      <Text
-                        style={{ color: "white", fontSize: moderateScale(14) }}
-                      >
-                        {parseTime(status.durationMillis)}
-                      </Text>
+                      {topOverlayTitle}
+                    </Text>
 
-                      <OverlayButton
-                        icon={
-                          <MaterialCommunityIcons
-                            name="fullscreen"
-                            size={moderateScale(25)}
-                            color="white"
-                            style={{ marginLeft: moderateScale(5) }}
-                          />
-                        }
-                        onPress={handleFullscreenPress}
-                      />
-                    </View>
+                    <Text
+                      numberOfLines={1}
+                      style={{ color: "gray", fontSize: moderateScale(12) }}
+                    >
+                      {topOverlayDescription}
+                    </Text>
                   </>
                 )}
               </View>
 
-              {/* Progress bar */}
-              <View style={styles.sliderContainer}>
-                {showControls && (
-                  <Slider
-                    style={styles.slider}
-                    minimumValue={0}
-                    maximumValue={status.durationMillis}
-                    value={status.positionMillis}
-                    minimumTrackTintColor="#FF6400"
-                    maximumTrackTintColor="#fff"
-                    thumbTintColor="#fff"
-                    onValueChange={handleSlideDrag}
-                  />
-                )}
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: "row",
+                  alignItems: "baseline",
+                  justifyContent: "flex-end",
+                }}
+              >
+                <OverlayButton
+                  icon={
+                    <Entypo
+                      name="dots-three-vertical"
+                      size={moderateScale(23)}
+                      color="white"
+                    />
+                  }
+                  onPress={showDialog}
+                  disabled={!showOverlay}
+                />
               </View>
             </View>
-          )}
+
+            {/* Middle */}
+            <View style={styles.middleOverlayContainer}>
+              {/* Previous button */}
+              <OverlayButton
+                icon={
+                  <MaterialCommunityIcons
+                    name="rewind"
+                    size={moderateScale(30)}
+                    color={previousButtonDisable ? "gray" : "white"}
+                  />
+                }
+                disabled={previousButtonDisable || !showOverlay}
+                onPress={handlePreviousPress}
+              />
+              {/* Seek left button */}
+              <OverlayButton
+                icon={
+                  <MaterialIcons
+                    name="replay"
+                    size={moderateScale(30)}
+                    color="white"
+                  />
+                }
+                onPress={handleSeekLeftPress}
+                disabled={!showOverlay}
+              />
+              {/* Play button */}
+              <OverlayButton
+                icon={
+                  status.isBuffering && !status.isPlaying ? (
+                    <ActivityIndicator
+                      size={moderateScale(80)}
+                      color="rgba(250,250,250,0.8)"
+                    />
+                  ) : (
+                    <MaterialIcons
+                      name={status.isPlaying ? "pause" : "play-arrow"}
+                      size={moderateScale(80)}
+                      color="white"
+                      iconStyle={{
+                        borderWidth: 10,
+                        borderColor: "black",
+                      }}
+                    />
+                  )
+                }
+                onPress={handlePlayPress}
+                disabled={!showOverlay}
+              />
+              {/* Seek right */}
+              <OverlayButton
+                icon={
+                  <MaterialIcons
+                    name="replay"
+                    size={moderateScale(30)}
+                    color="white"
+                    style={{ transform: [{ rotateY: "180deg" }] }}
+                  />
+                }
+                onPress={handleSeekRightPress}
+                disabled={!showOverlay}
+              />
+              {/* Next button */}
+              <OverlayButton
+                icon={
+                  <Entypo
+                    name="controller-fast-forward"
+                    size={moderateScale(30)}
+                    color={nextButtonDisable ? "gray" : "white"}
+                  />
+                }
+                disabled={nextButtonDisable || !showOverlay}
+                onPress={handleNextPress}
+              />
+            </View>
+
+            {/* Bottom */}
+            <View style={styles.bottomOverlayContainer}>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Text
+                  style={{
+                    color: "white",
+                    marginLeft: moderateScale(5),
+                    fontSize: moderateScale(14),
+                  }}
+                >
+                  {parseTime(status.positionMillis)}
+                </Text>
+              </View>
+
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+              >
+                <Text style={{ color: "white", fontSize: moderateScale(14) }}>
+                  {parseTime(status.durationMillis)}
+                </Text>
+
+                <OverlayButton
+                  icon={
+                    <MaterialCommunityIcons
+                      name="fullscreen"
+                      size={moderateScale(25)}
+                      color="white"
+                      style={{ marginLeft: moderateScale(5) }}
+                    />
+                  }
+                  onPress={handleFullscreenPress}
+                  disabled={!showOverlay}
+                />
+              </View>
+            </View>
+
+            {/* Progress bar */}
+            <View style={styles.sliderContainer}>
+              <Slider
+                style={styles.slider}
+                minimumValue={0}
+                maximumValue={status.durationMillis}
+                value={status.positionMillis}
+                minimumTrackTintColor="#FF6400"
+                maximumTrackTintColor="#fff"
+                thumbTintColor="#fff"
+                onValueChange={handleSlideDrag}
+              />
+            </View>
+          </View>
         </View>
       </TouchableWithoutFeedback>
     </>

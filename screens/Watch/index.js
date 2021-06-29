@@ -195,47 +195,50 @@ export default function Watch({ route }) {
           nextButtonDisable={episode >= animeInfo.episodes.length}
         />
       </View>
-      {orientation !== "LANDSCAPE" && (
-        <View style={styles.infoContainer}>
-          <ScrollView horizontal style={{ flex: 1 }}>
-            {/* Anime info column */}
-            <InfoColumn info={animeInfo} />
+      <View
+        style={[
+          styles.infoContainer,
+          { display: orientation === "LANDSCAPE" ? "none" : "flex" },
+        ]}
+      >
+        <ScrollView horizontal style={{ flex: 1 }}>
+          {/* Anime info column */}
+          <InfoColumn info={animeInfo} />
 
-            {/* Episode column */}
+          {/* Episode column */}
+          <ListColumn
+            key="episodes"
+            numColumns={2}
+            data={animeInfo.episodes.slice(0, showNumber)}
+            renderItem={handleEpisodeItem}
+            keyExtractor={(item) => item.id.toString()}
+            onEndReached={handleEndReached}
+            onEndReachedThreshold={1}
+            initialNumToRender={12}
+            getItemLayout={getItemLayout}
+            columnWrapperStyle={{ flex: 1, justifyContent: "center" }}
+            title="Tập phim"
+          />
+
+          {/* Recommended anime list column */}
+          {animeList && (
             <ListColumn
-              key="episodes"
+              key="recommended"
               numColumns={2}
-              data={animeInfo.episodes.slice(0, showNumber)}
-              renderItem={handleEpisodeItem}
+              data={animeList.recommended}
+              renderItem={handleAnimeItem}
               keyExtractor={(item) => item.id.toString()}
-              onEndReached={handleEndReached}
-              onEndReachedThreshold={1}
               initialNumToRender={12}
               getItemLayout={getItemLayout}
               columnWrapperStyle={{ flex: 1, justifyContent: "center" }}
-              title="Tập phim"
+              title="Hôm nay xem gì"
             />
+          )}
 
-            {/* Recommended anime list column */}
-            {animeList && (
-              <ListColumn
-                key="recommended"
-                numColumns={2}
-                data={animeList.recommended}
-                renderItem={handleAnimeItem}
-                keyExtractor={(item) => item.id.toString()}
-                initialNumToRender={12}
-                getItemLayout={getItemLayout}
-                columnWrapperStyle={{ flex: 1, justifyContent: "center" }}
-                title="Hôm nay xem gì"
-              />
-            )}
-
-            {/* Comments column */}
-            <CommentsColumn info={animeInfo} />
-          </ScrollView>
-        </View>
-      )}
+          {/* Comments column */}
+          <CommentsColumn info={animeInfo} />
+        </ScrollView>
+      </View>
     </View>
   );
 }
