@@ -9,6 +9,7 @@ import Slider from "@react-native-community/slider";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import { Video as ExpoVideo } from "expo-av";
+import { activateKeepAwake, deactivateKeepAwake } from "expo-keep-awake";
 import * as ScreenOrientation from "expo-screen-orientation";
 import { Parser } from "m3u8-parser/src/index";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -17,11 +18,11 @@ import {
   StyleSheet,
   Text,
   TouchableWithoutFeedback,
+  useWindowDimensions,
   View,
 } from "react-native";
-import { Dialog, Portal, RadioButton, Button } from "react-native-paper";
-import { activateKeepAwake, deactivateKeepAwake } from "expo-keep-awake";
 import { PanGestureHandler } from "react-native-gesture-handler";
+import { Button, Dialog, Portal, RadioButton } from "react-native-paper";
 import Animated, {
   runOnJS,
   useAnimatedGestureHandler,
@@ -65,6 +66,8 @@ const qualities = [
   },
 ];
 
+const DISTANCE = 70;
+
 export default function Video({
   source,
   topOverlayTitle,
@@ -82,8 +85,6 @@ export default function Video({
   const video = useRef(null);
   const DOMAIN = useRef(null);
 
-  const dragY = useSharedValue(0);
-
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [playlists, setPlaylists] = useState([]);
@@ -94,9 +95,16 @@ export default function Video({
 
   const [showOverlay, setShowOverlay] = useState(true);
   const [showBottom, setShowBottom] = useState(false);
-  const timeoutLeave = useRef(null);
 
   const orientation = useOrientation();
+  const window = useWindowDimensions();
+
+  const MAX_BOTTOM_SHOW = window.height - bottomHeight;
+  const MAX_BOTTOM_HIDE = (window.height * 90) / 100;
+
+  const topY = useSharedValue(
+    orientation === "LANDSCAPE" ? MAX_BOTTOM_HIDE : window.height
+  );
 
   useEffect(() => {
     if (orientation === "LANDSCAPE") {
@@ -207,42 +215,51 @@ export default function Video({
     );
   }, [orientation]);
 
-  function updateSetBottom(val) {
-    setShowBottom(val);
-  }
-
-  function updateSetOverlay(val) {
-    setShowOverlay(val);
-  }
-
   const handleGestureEvent = useAnimatedGestureHandler({
     onStart: (e, ctx) => {
-      ctx.absoluteY = e.absoluteY;
-      runOnJS(updateSetOverlay)(true);
-    },
-    onEnd: (e, ctx) => {
-      const dragValue = e.absoluteY - ctx.absoluteY;
+      if (orientation !== "LANDSCAPE") return;
 
-      if (Math.abs(dragValue) > 50) {
-        dragY.value = dragValue;
+      ctx.startY = topY.value;
+      runOnJS(setShowOverlay)(true);
+    },
+    onActive: (e, ctx) => {
+      const dragValue = ctx.startY + e.translationY;
+
+      if (MAX_BOTTOM_SHOW >= dragValue) {
+        topY.value = MAX_BOTTOM_SHOW;
+
+        return;
+      }
+      if (dragValue >= MAX_BOTTOM_HIDE) {
+        topY.value = MAX_BOTTOM_HIDE;
+
+        return;
+      }
+
+      topY.value = dragValue;
+    },
+    onEnd: () => {
+      if (topY.value + DISTANCE >= MAX_BOTTOM_HIDE) {
+        topY.value = withTiming(MAX_BOTTOM_HIDE);
+        runOnJS(setShowBottom)(false);
+
+        return;
+      }
+
+      if (MAX_BOTTOM_SHOW + DISTANCE >= topY.value) {
+        topY.value = withTiming(MAX_BOTTOM_SHOW);
+        runOnJS(setShowBottom)(true);
+
+        return;
       }
     },
   });
 
   const animationStyle = useAnimatedStyle(() => {
-    "worklet";
-
-    if (dragY.value < 0) {
-      runOnJS(updateSetBottom)(true);
-    } else {
-      runOnJS(updateSetBottom)(false);
-      dragY.value = 0;
-    }
-
     return {
-      bottom: dragY.value < 0 ? withTiming(0) : withTiming(bottomHeight * -1),
+      top: topY.value,
     };
-  }, [dragY.value]);
+  }, [topY.value, orientation]);
 
   const navigation = useNavigation();
 
@@ -665,11 +682,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     position: "absolute",
+    zIndex: 2,
   },
   videoBottomContainer: {
     position: "absolute",
-    // width: "100%",
     flex: 1,
-    zIndex: 10,
+    zIndex: 1,
   },
 });

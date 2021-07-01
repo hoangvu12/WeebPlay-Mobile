@@ -206,7 +206,7 @@ export default function Watch({ route }) {
               horizontal
             />
           }
-          bottomHeight={CARD_HEIGHT + 70}
+          bottomHeight={CARD_HEIGHT + 75}
           bottomStyle={{ padding: 10 }}
         />
       </View>
